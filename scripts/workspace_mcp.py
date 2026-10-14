@@ -3,6 +3,7 @@
 import json, os, shlex, subprocess, sys
 CFG="/opt/data/ssh-workspace/config"
 TOOL={"name":"workspace_shell","description":"Run commands in isolated Merly Workspace as uid 10001, not inside Hermes or on VPS host. Working directory /workspace; /monitor/status.json is read-only. No production deploy, Docker socket, or sudo. Use for offline code and tests only.","inputSchema":{"type":"object","properties":{"command":{"type":"string","minLength":1,"maxLength":4000}},"required":["command"],"additionalProperties":False}}
+UPLOAD_TOOL={"name":"workspace_import_document","description":"Import recent Telegram Excel/CSV file to isolated Workspace /workspace/input/ via SSH. Use after document upload.","inputSchema":{"type":"object","properties":{"filename_hint":{"type":"string","maxLength":120}},"additionalProperties":False}}
 def send(id,result=None,error=None):
     p={"jsonrpc":"2.0","id":id}
     if error is None:p["result"]=result
@@ -29,7 +30,7 @@ def handle(m):
     method=m.get("method")
     if method=="initialize":
         send(id,{"protocolVersion":(m.get("params") or {}).get("protocolVersion","2025-03-26"),"capabilities":{"tools":{"listChanged":False}},"serverInfo":{"name":"merly-workspace","version":"0.1.0"}})
-    elif method=="tools/list":send(id,{"tools":[TOOL]})
+    elif method=="tools/list":send(id,{"tools":[TOOL,UPLOAD_TOOL]})
     elif method=="ping":send(id,{})
     elif method=="tools/call":
         p=m.get("params") or {}
