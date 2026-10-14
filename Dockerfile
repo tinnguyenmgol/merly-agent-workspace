@@ -3,8 +3,11 @@ ENV DEBIAN_FRONTEND=noninteractive PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 
 
 # Separate APT from user provisioning so Coolify identifies the failing step.
 RUN set -eux; \
-    echo '=== MERLY: APT repository refresh ==='; \
-    apt-get -o Acquire::Retries=3 update
+    echo '=== MERLY: apt update + install (same layer) ==='; \
+    apt-get -o Acquire::Retries=3 update; \
+    apt-get -o Acquire::Retries=3 install -y --no-install-recommends \
+      openssh-server python3 python3-pytest python3-venv bash ca-certificates; \
+    rm -rf /var/lib/apt/lists/*
 
 RUN set -eux; \
     echo '=== MERLY: installing system packages ==='; \
