@@ -31,24 +31,11 @@ services:
         target: /workspace
         bind:
           create_host_path: false
-      - type: bind
-        source: /opt/merly-workspace-access/merly-agent.pub
-        target: /etc/ssh/authorized_keys/merly-agent
-        read_only: true
-        bind:
-          create_host_path: false
-      - type: bind
-        source: /opt/merly-workspace-access/host_keys
-        target: /etc/ssh/host_keys
-        read_only: true
-        bind:
-          create_host_path: false
-      - type: bind
-        source: /var/lib/merly-monitor-public
-        target: /monitor
-        read_only: true
-        bind:
-          create_host_path: false
+      # Explicit :ro syntax for SSH credentials and exported monitoring data.
+      # Runtime mount flags MUST be checked after Coolify deploy.
+      - /opt/merly-workspace-access/merly-agent.pub:/etc/ssh/authorized_keys/merly-agent:ro
+      - /opt/merly-workspace-access/host_keys:/etc/ssh/host_keys:ro
+      - /var/lib/merly-monitor-public:/monitor:ro
     networks:
       - merly_private
     expose:
